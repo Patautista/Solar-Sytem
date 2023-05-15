@@ -6,18 +6,19 @@
 
 using namespace cv;
 using namespace std;
+using namespace lib;
 
 
 int main(int argc, char** argv)
 {
 	int width = 500;
 	int height = 500;
+	lib::Point center = lib::Point(width * 0.50, height * 0.50);
 	String windowName = "Window";
-
-	lib::Polygon* square = lib::createSquare(300, lib::Point(width * 0.50, height * 0.50));
-	lib::Polygon* circle = lib::createCircle(200, lib::Point(width * 0.50, height * 0.50));
-	Mat* background = createZerosMat(500, 500);
-	circle->Draw(background);
+	//lib::Polygon* triangle = lib::createTriangle(300, center, {Color::blue, Color::salmon, Color::orange});
+	auto polygon = createSquare(400, center, { Color::blue , Color::magenta, Color::cyan, Color::yellow});
+	auto background = createZerosMat(500, 500);
+	polygon->Draw(background);
 	namedWindow(windowName); // Create a window
 
 	imshow(windowName, *background);
@@ -26,8 +27,7 @@ int main(int argc, char** argv)
 
 	destroyWindow(windowName); //destroy the created window
 	
-	delete(square);
-	delete(circle);
+	delete(polygon);
 	delete(background);
 	return 0;
 }
