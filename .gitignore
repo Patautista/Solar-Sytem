@@ -22,7 +22,7 @@
 *.vcxproj
 *.vcxproj.filters
 *.vcxproj.user
-*.sln
+
 *.suo
 *.vcproj
 *.vcproj.*
