@@ -1,5 +1,11 @@
 namespace lib {
-    Polygon* createSquare(int size, Point position, std::vector<Color> colors) {
+    Polygon* createRectangle(const Point& topLeft, const Point& bottomRight) {
+        Point topRight(bottomRight.x, topLeft.y, topLeft.color);
+        Point bottomLeft(topLeft.x, bottomRight.y, bottomRight.color);
+        return new Polygon({ topLeft, topRight, bottomRight, bottomLeft });
+    }
+
+    Polygon* createSquare(float size, Point position, std::vector<Color> colors) {
         if (colors.size()<4) {
             std::vector<Point> points = {
             Point(position.x - size / 2, position.y - size / 2, Color::white),
@@ -17,7 +23,7 @@ namespace lib {
         };
         return new Polygon(points);
     }
-    Polygon* createCircle(int radius, Point center, int num_segments, Color color) {
+    Polygon* createCircle(float radius, Point center, int num_segments, Color color) {
         const double angle_step = 2 * CV_PI / num_segments;
         std::vector<Point> points;
 
@@ -59,4 +65,5 @@ namespace lib {
 
         poly1->setPoints(points1);
     }
+
 }

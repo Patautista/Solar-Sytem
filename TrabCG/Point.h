@@ -6,7 +6,7 @@ namespace lib {
         Color color;
 
         Point() : x(0), y(0), color(Color()) {}
-        Point(int x_, int y_, Color color_) : x(x_), y(y_), color(color_) {}
-        Point(int x, int y) : x(x), y(y), color(255, 255, 255) {}
+        Point(float x_, float y_, Color color_) : x(x_), y(y_), color(color_) {}
+        Point(float x, float y) : x(x), y(y), color(255, 255, 255) {}
     };
 }
