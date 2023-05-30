@@ -24,6 +24,9 @@
 
 x64/
 
+.vs
+.vs/
+
 .DS_Store
 
 Thumbs.db

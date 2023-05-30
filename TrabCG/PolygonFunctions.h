@@ -5,6 +5,35 @@ namespace lib {
         return new Polygon({ topLeft, topRight, bottomRight, bottomLeft });
     }
 
+    Polygon* createOctagon(const Point& center, double size, const std::vector<Color>& colors) {
+        Polygon* octagon = new Polygon({});
+
+        // Calculate the angle between each pair of vertices
+        double angleIncrement = 2 * 3.1415 / 8;
+        double currentAngle = 0.0;
+
+        // Iterate over each vertex position
+        for (int i = 0; i < 8; ++i) {
+            // Calculate the coordinates of the vertex based on the center and size
+            double x = center.x + size * std::cos(currentAngle);
+            double y = center.y + size * std::sin(currentAngle);
+
+            // Create the point with or without color based on the provided vector
+            if (i < colors.size()) {
+                octagon->addPoint(Point(x, y, colors[i]));
+            }
+            else {
+                octagon->addPoint(Point(x, y));
+            }
+
+            // Update the angle for the next vertex
+            currentAngle += angleIncrement;
+        }
+
+        return octagon;
+    }
+
+
     Polygon* createSquare(float size, Point position, std::vector<Color> colors) {
         if (colors.size()<4) {
             std::vector<Point> points = {

@@ -16,6 +16,15 @@ namespace lib {
         static const Color magenta;
         static const Color salmon;
         static const Color brown;
+        static const Color darkRed;
+        static const Color darkBlue;
+        static const Color darkGreen;
+        static const Color darkCyan;
+        static const Color darkYellow;
+        static const Color cream;
+        static const Color pastelRed;
+        static const Color pastelGreen;
+        static const Color pastelBlue;
 
         Color() : r(0), g(0), b(0) {}
         Color(int red, int green, int blue) : r(red), g(green), b(blue) {}
@@ -34,4 +43,13 @@ namespace lib {
     const Color Color::magenta = Color(255, 0, 255);
     const Color Color::salmon = Color(250, 128, 114);
     const Color Color::brown = Color(139, 69, 19);
+    const Color Color::darkRed = Color(150, 0, 0);
+    const Color Color::darkBlue = Color(0, 0, 139);
+    const Color Color::darkGreen = Color(0, 100, 0);
+    const Color Color::darkCyan = Color(0, 139, 139);
+    const Color Color::darkYellow = Color(139, 139, 0);
+    const Color Color::cream = Color(255, 253, 208);
+    const Color Color::pastelRed = Color(255, 204, 203);
+    const Color Color::pastelGreen = Color(204, 255, 204);
+    const Color Color::pastelBlue = Color(204, 230, 255);
 }

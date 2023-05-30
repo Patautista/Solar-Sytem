@@ -21,13 +21,13 @@ namespace lib {
 
         if (denominator == 0.0) {
             // The line segments are parallel or coincident
-            return Point(0, 0);  // Return an invalid point
+            return Point(0, 0); // Invalid
         }
 
         double px = ((x1 * y2 - y1 * x2) * (x3 - x4) - (x1 - x2) * (x3 * y4 - y3 * x4)) / denominator;
         double py = ((x1 * y2 - y1 * x2) * (y3 - y4) - (y1 - y2) * (x3 * y4 - y3 * x4)) / denominator;
 
-        return Point(px, py);
+        return Point(px, py, p2.color);
     }
 
     int calculateOrientation(const Point& p, const Point& q, const Point& r) {
@@ -64,24 +64,98 @@ namespace lib {
 
         return false;
     }
-    Polygon* findIntersection(const Polygon* polygon1, const Polygon* polygon2) {
-        Polygon* intersection = new Polygon({});
-        auto points1 = polygon1->getPoints();
-        auto points2 = polygon2->getPoints();
 
-        // Iterate over each point of polygon1
+    // Projection
+
+    double squaredDistancePointToSegment(const Point& point, const Point& segmentStart, const Point& segmentEnd) {
+        double dx = segmentEnd.x - segmentStart.x;
+        double dy = segmentEnd.y - segmentStart.y;
+
+        if (dx == 0 && dy == 0) {
+            // The segment is a single point
+            double px = point.x - segmentStart.x;
+            double py = point.y - segmentStart.y;
+            return px * px + py * py;
+        }
+
+        double t = ((point.x - segmentStart.x) * dx + (point.y - segmentStart.y) * dy) / (dx * dx + dy * dy);
+        t = std::max(0.0, std::min(1.0, t));
+
+        double projX = segmentStart.x + t * dx;
+        double projY = segmentStart.y + t * dy;
+
+        double px = point.x - projX;
+        double py = point.y - projY;
+
+        return px * px + py * py;
+    }
+
+    Point getClosestPointOnSegment(const Point& point, const Point& segmentStart, const Point& segmentEnd) {
+        double dx = segmentEnd.x - segmentStart.x;
+        double dy = segmentEnd.y - segmentStart.y;
+
+        if (dx == 0 && dy == 0) {
+            // The segment is a single point
+            return segmentStart;
+        }
+
+        double t = ((point.x - segmentStart.x) * dx + (point.y - segmentStart.y) * dy) / (dx * dx + dy * dy);
+        t = std::max(0.0, std::min(1.0, t));
+
+        double projX = segmentStart.x + t * dx;
+        double projY = segmentStart.y + t * dy;
+
+        return Point(projX, projY);
+    }
+
+    Point projectPointOntoPolygon(const Point& point, const std::vector<Point>& polygonPoints) {
+        double minDistance = std::numeric_limits<double>::max();
+        Point closestPoint;
+
+        // Iterate over each edge of the polygon
+        for (size_t i = 0; i < polygonPoints.size(); i++) {
+            const Point& p1 = polygonPoints[i];
+            const Point& p2 = polygonPoints[(i + 1) % polygonPoints.size()];
+
+            // Calculate the squared distance from the point to the line segment
+            double distance = squaredDistancePointToSegment(point, p1, p2);
+
+            // Update the closest point if the distance is smaller
+            if (distance < minDistance) {
+                minDistance = distance;
+                closestPoint = getClosestPointOnSegment(point, p1, p2);
+                closestPoint.color = point.color;
+            }
+        }
+
+        return closestPoint;
+    }
+
+    // Intersection
+
+    Polygon* findIntersection(const Polygon* polygon, const Polygon* window) {
+        Polygon* intersection = new Polygon({});
+        intersection->setTexture(polygon->getTexture());
+        const std::vector<Point>& points1 = polygon->getPoints();
+        const std::vector<Point>& points2 = window->getPoints();
+
+        // Iterate over each point of the polygon
         for (size_t i = 0; i < points1.size(); i++) {
             const Point& p1 = points1[i];
             const Point& p2 = points1[(i + 1) % points1.size()];
-            if (polygon2->containsPoint(p1)) {
+
+            // Check if the point is inside the window
+            if (window->containsPoint(p1)) {
                 intersection->addPoint(p1);
             }
 
-            // Iterate over each point of polygon2
+            // Iterate over each point of the window
             for (size_t j = 0; j < points2.size(); j++) {
+
                 const Point& q1 = points2[j];
                 const Point& q2 = points2[(j + 1) % points2.size()];
 
+                // Check if the line segments intersect
                 if (doSegmentsIntersect(p1, p2, q1, q2)) {
                     // Calculate the intersection point
                     Point intersectionPoint = computeIntersection(p1, p2, q1, q2);
@@ -98,6 +172,16 @@ namespace lib {
             return nullptr;
         }
 
+        // Add projected points of the polygon vertices outside the window
+        const std::vector<Point>& intersectionPoints = intersection->getPoints();
+        for (const Point& p : points1) {
+            if (!window->containsPoint(p)) {
+                Point projection = projectPointOntoPolygon(p, points2);
+                intersection->addPoint(projection);
+            }
+        }
+
         return intersection;
     }
+
 }
