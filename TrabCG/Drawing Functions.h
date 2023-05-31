@@ -47,6 +47,14 @@ namespace lib {
         cv::rectangle(image, cv::Point(0, 0), cv::Point(numCols - 1, numRows - 1), borderColor, 1);
     }
 
+    void TruncateTexture(cv::Mat& mat, cv::Mat& texture) {
+        cv::Mat resizedTexture;
+        cv::resize(texture, resizedTexture, mat.size());
+
+        // Copy the pixel values from the resized texture image to the viewport
+        resizedTexture.copyTo(mat);
+    }
+
     void drawCircle(cv::Mat& image, int xc, int yc, int radius, cv::Scalar color) {
         int x = 0;
         int y = radius;

@@ -44,9 +44,9 @@ int main(int argc, char** argv)
 { 
 	// Define viewport dimensions
 	auto center = lib::Point(0, 0);
-	int viewport_width = 1100;
+	int viewport_width = 1000;
 	int viewport_height = 800;
-	auto viewport = createZerosMat(viewport_height, viewport_width);
+	Mat viewport = createZerosMat(viewport_height, viewport_width);
 	// Define window attributes
 	lib::Point window_top_left = lib::Point(-250, 250);
 	lib::Point window_bottom_right = lib::Point(100, -250);
@@ -56,7 +56,8 @@ int main(int argc, char** argv)
 	
 	// Create polygons set
 	vector<lib::Polygon*> polygons;
-	auto texture = cv::imread("./textures/background.jpg");
+	Mat texture = cv::imread("./textures/background.png");
+	TruncateTexture(viewport, texture);
 	//auto circle = createCircle(viewport_height * 0.25, center, 30, Color::blue);
 
 	// Sun
@@ -139,6 +140,7 @@ int main(int argc, char** argv)
 		window.Draw(&viewport);
 		imshow(windowName, viewport);
 		viewport = createZerosMat(viewport_height, viewport_width);
+		TruncateTexture(viewport, texture);
 		waitKey(50);
 	}
 	stopFlag = true;
