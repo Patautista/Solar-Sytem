@@ -24,6 +24,21 @@ void rotateThread(lib::Polygon* poly, double angle, lib::Point center)
 	}
 	std::cout << "Thread stopped" << std::endl;
 }
+void scaleThread(lib::Polygon* poly, lib::Point center)
+{
+	while (!stopFlag)
+	{
+		for (int i = 0; i <= 6; i++) {
+			poly->Scale(1.01, 1.01, center);
+			Sleep(100);
+		}
+		for (int i = 0; i <= 6; i++) {
+			poly->Scale(0.99, 0.99, center);
+			Sleep(100);
+		}
+	}
+	std::cout << "Thread stopped" << std::endl;
+}
 
 int main(int argc, char** argv)
 { 
@@ -90,12 +105,12 @@ int main(int argc, char** argv)
 	window.Zoom(3);
 
 	// Start everything and here we go
-	std::thread rotate0(std::bind(rotateThread,polygons[0], 8, center));
-	std::thread rotate1(std::bind(rotateThread, polygons[1], -5.4, center));
-	std::thread rotate2(std::bind(rotateThread, polygons[2], -6, center));
+	std::thread scale0(std::bind(scaleThread,polygons[0], center));
+	std::thread rotate1(std::bind(rotateThread, polygons[1], -15, center));
+	std::thread rotate2(std::bind(rotateThread, polygons[2], -5, center));
 	std::thread rotate3(std::bind(rotateThread, polygons[3], -4, center));
 	std::thread rotate4(std::bind(rotateThread, polygons[4], -7, center));
-	std::thread rotate5(std::bind(rotateThread, polygons[5], -7, center));
+	std::thread rotate5(std::bind(rotateThread, polygons[5], -4.5, center));
 	std::thread rotate6(std::bind(rotateThread, polygons[6], -10, center));
 	std::thread rotate7(std::bind(rotateThread, polygons[7], -6.8, center));
 
@@ -127,7 +142,7 @@ int main(int argc, char** argv)
 		waitKey(50);
 	}
 	stopFlag = true;
-	rotate0.join();
+	scale0.join();
 	rotate1.join();
 	rotate2.join();
 	rotate3.join();

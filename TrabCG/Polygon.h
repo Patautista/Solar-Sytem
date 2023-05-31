@@ -175,8 +175,8 @@ namespace lib {
                 cv::Mat transformedPointMat = transform * pointMat;
 
                 // Update the point with the transformed coordinates
-                point.x = round(transformedPointMat.at<double>(0, 0));
-                point.y = round(transformedPointMat.at<double>(1, 0));
+                point.x = transformedPointMat.at<double>(0, 0);
+                point.y = transformedPointMat.at<double>(1, 0);
 
                 // Translate the point back to its original position
                 point.x += center.x;
