@@ -19,6 +19,7 @@ void rotateThread(lib::Polygon* poly, double angle, lib::Point center)
 	while (!stopFlag)
 	{
 		poly->Rotate(angle, center);
+		poly->Rotate(angle, poly->mCenter);
 		Sleep(100);
 	}
 	std::cout << "Thread stopped" << std::endl;

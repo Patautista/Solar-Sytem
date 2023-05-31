@@ -182,8 +182,8 @@ namespace lib {
                 point.x += center.x;
                 point.y += center.y;
             }
+            updatePolygonCenter();
         }
-
         void _drawFrame(cv::Mat* mat) {
             m_frame_points = m_vertices;
             int n = m_vertices.size();
@@ -196,9 +196,12 @@ namespace lib {
         }
     public:
         Polygon(const std::vector<Point>& _points) : m_vertices(_points), m_framed(false), m_frame_points(_points) {
+            updatePolygonCenter();
         }
         Polygon(const std::vector<Point>& _points, const cv::Mat& _texture) : m_vertices(_points), m_texture(_texture), m_framed(false), m_frame_points(_points) {
+            updatePolygonCenter();
         }
+        Point mCenter = { 0,0 };
         void Draw(cv::Mat* mat) {
             if (m_texture.cols<=0) {
                 _drawFrame(mat);
@@ -289,6 +292,21 @@ namespace lib {
             }
             // If the number of intersections is odd, the point is inside the polygon
             return (intersectCount % 2 == 1);
+        }
+
+        void updatePolygonCenter() {
+            float totalX = 0.0;
+            float totalY = 0.0;
+
+            for (const Point& point : m_vertices) {
+                totalX += point.x;
+                totalY += point.y;
+            }
+
+            float centerX = totalX / m_vertices.size();
+            float centerY = totalY / m_vertices.size();
+
+            mCenter =  { centerX, centerY };
         }
 
         Color mapPointInTexture(double x, double y, const cv::Mat* tex) {
