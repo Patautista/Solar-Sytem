@@ -28,12 +28,12 @@ void scaleThread(lib::Polygon* poly, lib::Point center)
 {
 	while (!stopFlag)
 	{
-		for (int i = 0; i <= 6; i++) {
-			poly->Scale(1.01, 1.01, center);
+		for (int i = 0; i <= 7; i++) {
+			poly->Scale(1.02, 1.02, center);
 			Sleep(100);
 		}
-		for (int i = 0; i <= 6; i++) {
-			poly->Scale(0.99, 0.99, center);
+		for (int i = 0; i <= 7; i++) {
+			poly->Scale(0.98, 0.98, center);
 			Sleep(100);
 		}
 	}
