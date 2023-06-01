@@ -7,6 +7,8 @@
 #include "Window.h"
 #include "Windows.h"
 
+#pragma comment(lib, "winmm.lib")
+
 
 using namespace cv;
 using namespace std;
@@ -40,6 +42,31 @@ void scaleThread(lib::Polygon* poly, lib::Point center)
 	std::cout << "Thread stopped" << std::endl;
 }
 
+void showInitialScreen(Mat& screen)
+{	
+	cv::Mat earth_text = imread("./textures/earth.png");
+	drawCircle(screen, screen.cols / 4, screen.rows * 3 / 4 + 250, 325, cv::Vec3b(1, 1, 1));
+	lib::floodFillWithMatrix(screen, earth_text, cv::Point(screen.cols / 4 + 1, screen.rows * 3 / 4 + 100));
+
+	//Draw static with flood fill saturn planet
+	cv::Mat sat_text = imread("./textures/saturntext.png");
+	drawCircle(screen, screen.cols - 100, screen.rows/4, 25, cv::Vec3b(1, 1, 1));
+	lib::floodFill(screen, screen.rows / 4, screen.cols - 100, cv::Vec3b(191, 229, 250));
+
+	//Draw static with flood fill saturn ring
+	cv::Mat satring_text = imread("./textures/saturnring.png");
+	drawEllipse(screen, cv::Point(screen.cols - 100, screen.rows / 4), 125, 20, cv::Vec3b(1, 1, 1), 1);
+	lib::floodFill(screen, screen.rows / 4, screen.cols - 150, cv::Vec3b(175, 189, 191));
+	lib::floodFill(screen, screen.rows / 4, screen.cols - 50, cv::Vec3b(175, 189, 191));
+	
+	
+	//Draw static with flood fill Sun
+	cv::Mat sun_text = imread("./textures/sun.png");
+	drawCircle(screen, screen.cols / 2, screen.rows / 2 - 20, 131 , cv::Vec3b(1,1,1));
+	lib::floodFillWithMatrix(screen, sun_text, cv::Point(screen.cols / 2, screen.rows / 2));
+	
+}
+
 int main(int argc, char** argv)
 { 
 	// Define viewport dimensions
@@ -57,7 +84,7 @@ int main(int argc, char** argv)
 	// Create polygons set
 	vector<lib::Polygon*> polygons;
 	Mat texture = cv::imread("./textures/background.png");
-	TruncateTexture(viewport, texture);
+	
 	//auto circle = createCircle(viewport_height * 0.25, center, 30, Color::blue);
 
 	// Sun
@@ -104,7 +131,12 @@ int main(int argc, char** argv)
 
 	window.UpdateVisiblePolygons(polygons);
 	window.Zoom(3);
-
+	TruncateTexture(viewport, texture);
+	showInitialScreen(viewport);
+	imshow(windowName, viewport);
+	PlaySound(TEXT("path/to/your/sound/file.wav"), NULL, SND_ASYNC | SND_LOOP);
+	waitKey(0);
+	
 	// Start everything and here we go
 	std::thread scale0(std::bind(scaleThread,polygons[0], center));
 	std::thread rotate1(std::bind(rotateThread, polygons[1], -15, center));
@@ -144,6 +176,7 @@ int main(int argc, char** argv)
 		waitKey(50);
 	}
 	stopFlag = true;
+	PlaySound(NULL, NULL, 0);
 	scale0.join();
 	rotate1.join();
 	rotate2.join();

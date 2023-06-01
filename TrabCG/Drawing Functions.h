@@ -1,6 +1,6 @@
 namespace lib {
 
-    void floodFill(cv::Mat& image, int startRow, int startCol, cv::Vec3b fillColor, cv::Vec3b borderColor) {
+    void floodFill(cv::Mat& image, int startRow, int startCol, cv::Vec3b fillColor) {
         int numRows = image.rows;
         int numCols = image.cols;
 
@@ -42,9 +42,45 @@ namespace lib {
                 pixelQueue.push(std::make_pair(row, col + 1)); // Right
             }
         }
+    }
 
-        // Draw the border around the filled region
-        cv::rectangle(image, cv::Point(0, 0), cv::Point(numCols - 1, numRows - 1), borderColor, 1);
+    void floodFillWithMatrix(cv::Mat& target, const cv::Mat& source, cv::Point seedPoint) {
+        if (seedPoint.x < 0 || seedPoint.y < 0 || seedPoint.x >= target.cols || seedPoint.y >= target.rows) {
+            return; // Invalid seed point, return without filling
+        }
+
+        cv::Mat visitedMask = cv::Mat::zeros(target.size(), CV_8UC1);
+        std::queue<cv::Point> queue;
+
+
+        // Get the original color of the starting pixel
+        cv::Vec3b startColor = target.at<cv::Vec3b>(seedPoint.x, seedPoint.y);
+
+        queue.push(seedPoint);
+        visitedMask.at<uchar>(seedPoint) = 255;
+
+        while (!queue.empty()) {
+            cv::Point currentPoint = queue.front();
+            queue.pop();
+            cv::Point currentPointsource = cv::Point(currentPoint.x % source.cols, currentPoint.y % source.rows);
+            target.at<cv::Vec3b>(currentPoint) = source.at<cv::Vec3b>(currentPointsource);
+
+            // Add neighbors to the queue if they are within the target matrix and haven't been visited
+            std::vector<cv::Point> neighbors = {
+                cv::Point(currentPoint.x + 1, currentPoint.y),
+                cv::Point(currentPoint.x - 1, currentPoint.y),
+                cv::Point(currentPoint.x, currentPoint.y + 1),
+                cv::Point(currentPoint.x, currentPoint.y - 1)
+            };
+
+            for (const cv::Point& neighbor : neighbors) {
+                if (neighbor.x >= 0 && neighbor.y >= 0 && neighbor.x < target.cols && neighbor.y < target.rows
+                    && visitedMask.at<uchar>(neighbor) == 0 && target.at<cv::Vec3b>(neighbor) == startColor) {
+                    queue.push(neighbor);
+                    visitedMask.at<uchar>(neighbor) = 255;
+                }
+            }
+        }
     }
 
     void TruncateTexture(cv::Mat& mat, cv::Mat& texture) {
@@ -55,84 +91,53 @@ namespace lib {
         resizedTexture.copyTo(mat);
     }
 
-    void drawCircle(cv::Mat& image, int xc, int yc, int radius, cv::Scalar color) {
-        int x = 0;
-        int y = radius;
-        int p = 3 - 2 * radius;
+    void drawLine(cv::Mat& image, int x1, int y1, int x2, int y2, cv::Vec3b color) {
+        int dx = std::abs(x2 - x1);
+        int dy = std::abs(y2 - y1);
+        int sx = (x1 < x2) ? 1 : -1;
+        int sy = (y1 < y2) ? 1 : -1;
+        int error = dx - dy;
 
-        while (x <= y) {
-            image.at<cv::Vec3b>(yc + y, xc + x) = cv::Vec3b(color[0], color[1], color[2]);
-            image.at<cv::Vec3b>(yc + x, xc + y) = cv::Vec3b(color[0], color[1], color[2]);
-            image.at<cv::Vec3b>(yc - y, xc + x) = cv::Vec3b(color[0], color[1], color[2]);
-            image.at<cv::Vec3b>(yc - x, xc + y) = cv::Vec3b(color[0], color[1], color[2]);
-            image.at<cv::Vec3b>(yc + y, xc - x) = cv::Vec3b(color[0], color[1], color[2]);
-            image.at<cv::Vec3b>(yc + x, xc - y) = cv::Vec3b(color[0], color[1], color[2]);
-            image.at<cv::Vec3b>(yc - y, xc - x) = cv::Vec3b(color[0], color[1], color[2]);
-            image.at<cv::Vec3b>(yc - x, xc - y) = cv::Vec3b(color[0], color[1], color[2]);
-
-            if (p < 0) {
-                p += 4 * x + 6;
+        while (x1 != x2 || y1 != y2) {
+            if (x1 >= 0 && x1 < image.cols && y1 >= 0 && y1 < image.rows) {
+                image.at<cv::Vec3b>(y1, x1) = color;
             }
-            else {
-                p += 4 * (x - y) + 10;
-                y--;
+
+            int error2 = error * 2;
+
+            if (error2 > -dy) {
+                error -= dy;
+                x1 += sx;
             }
-            x++;
-        }
-    }
 
-    void drawEllipse(cv::Mat& image, int xc, int yc, int rx, int ry, cv::Scalar color) {
-        int x = 0;
-        int y = ry;
-        int rx2 = rx * rx;
-        int ry2 = ry * ry;
-        int twoRx2 = 2 * rx2;
-        int twoRy2 = 2 * ry2;
-        int px = 0;
-        int py = twoRx2 * y;
-
-        int p = round(ry2 - (rx2 * ry) + (0.25 * rx2));
-
-        while (px < py) {
-            image.at<cv::Vec3b>(y + yc, x + xc) = cv::Vec3b(color[0], color[1], color[2]);
-            image.at<cv::Vec3b>(y + yc, -x + xc) = cv::Vec3b(color[0], color[1], color[2]);
-            image.at<cv::Vec3b>(-y + yc, x + xc) = cv::Vec3b(color[0], color[1], color[2]);
-            image.at<cv::Vec3b>(-y + yc, -x + xc) = cv::Vec3b(color[0], color[1], color[2]);
-
-            x += 1;
-            px = px + twoRy2;
-            if (p < 0) {
-                p = p + ry2 + px;
-            }
-            else {
-                y -= 1;
-                py = py - twoRx2;
-                p = p + ry2 + px - py;
-            }
-        }
-
-        p = round(ry2 * (x + 0.5) * (x + 0.5) + rx2 * (y - 1) * (y - 1) - rx2 * ry2);
-
-        while (y >= 0) {
-            image.at<cv::Vec3b>(y + yc, x + xc) = cv::Vec3b(color[0], color[1], color[2]);
-            image.at<cv::Vec3b>(y + yc, -x + xc) = cv::Vec3b(color[0], color[1], color[2]);
-            image.at<cv::Vec3b>(-y + yc, x + xc) = cv::Vec3b(color[0], color[1], color[2]);
-            image.at<cv::Vec3b>(-y + yc, -x + xc) = cv::Vec3b(color[0], color[1], color[2]);
-
-            y -= 1;
-            py = py - twoRx2;
-            if (p > 0) {
-                p = p + rx2 - py;
-            }
-            else {
-                x += 1;
-                px = px + twoRy2;
-                p = p + rx2 - py + px;
+            if (error2 < dx) {
+                error += dx;
+                y1 += sy;
             }
         }
     }
 
-    void drawCircle2(cv::Mat& image, int xc, int yc, int radius, cv::Vec3b color) {
+    void drawEllipse(cv::Mat& image, cv::Point center, int width, int height, cv::Vec3b color, int thickness) {
+        int radiusX = width / 2;
+        int radiusY = height / 2;
+
+        int centerX = center.x;
+        int centerY = center.y;
+
+        double aspectRatio = (double)width / height;
+
+        for (double angle = 0.0; angle < 2 * CV_PI; angle += 0.01) {
+            int x1 = centerX + radiusX * cos(angle);
+            int y1 = centerY + radiusY * sin(angle);
+
+            int x2 = centerX + radiusX * cos(angle + 0.01);
+            int y2 = centerY + radiusY * sin(angle + 0.01);
+
+            drawLine(image, x1, y1, x2, y2, color);
+        }
+    }
+
+    void drawCircle(cv::Mat& image, int xc, int yc, int radius, cv::Vec3b color) {
         int x = 0;
         int y = radius;
         int p = 1 - radius;
@@ -174,31 +179,6 @@ namespace lib {
         }
     }
 
-    void drawLine(cv::Mat& image, int x1, int y1, int x2, int y2, cv::Vec3b color) {
-        int dx = std::abs(x2 - x1);
-        int dy = std::abs(y2 - y1);
-        int sx = (x1 < x2) ? 1 : -1;
-        int sy = (y1 < y2) ? 1 : -1;
-        int error = dx - dy;
-
-        while (x1 != x2 || y1 != y2) {
-            if (x1 >= 0 && x1 < image.cols && y1 >= 0 && y1 < image.rows) {
-                image.at<cv::Vec3b>(y1, x1) = color;
-            }
-
-            int error2 = error * 2;
-
-            if (error2 > -dy) {
-                error -= dy;
-                x1 += sx;
-            }
-
-            if (error2 < dx) {
-                error += dx;
-                y1 += sy;
-            }
-        }
-    }
 
     void drawArc(cv::Mat& image, int centerX, int centerY, int radius, double startAngle, double endAngle, const cv::Vec3b& color) {
         double angleStep = 1.0 / radius; // Angle step size
