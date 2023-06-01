@@ -134,7 +134,7 @@ int main(int argc, char** argv)
 	TruncateTexture(viewport, texture);
 	showInitialScreen(viewport);
 	imshow(windowName, viewport);
-	PlaySound(TEXT("path/to/your/sound/file.wav"), NULL, SND_ASYNC | SND_LOOP);
+	PlaySound(TEXT("./sound/tema\ tampinha.wav"), NULL, SND_ASYNC | SND_LOOP);
 	waitKey(0);
 	
 	// Start everything and here we go
