@@ -64,7 +64,24 @@ void showInitialScreen(Mat& screen)
 	cv::Mat sun_text = imread("./textures/sun.png");
 	drawCircle(screen, screen.cols / 2, screen.rows / 2 - 20, 131 , cv::Vec3b(1,1,1));
 	lib::floodFillWithMatrix(screen, sun_text, cv::Point(screen.cols / 2, screen.rows / 2));
+
+	auto tilte = createSquare(screen.cols * 0.10, lib::Point(screen.cols * 0.20, screen.rows * 0.15), {});
+	tilte->setTexture(imread("./textures/title.jpg"));
+	tilte->Scale(3, 1, tilte->mCenter);
+	tilte->Draw(&screen);
+
+	auto credits = createSquare(screen.cols * 0.10, lib::Point(screen.cols * 0.20, screen.rows * 0.30), {});
+	credits->setTexture(imread("./textures/credits.png"));
+	credits->Scale(3.5, 0.8, credits->mCenter);
+	credits->Draw(&screen);
 	
+	auto instructions = createSquare(screen.cols*0.17, lib::Point(screen.cols * 0.80, screen.rows * 0.80), {});
+	instructions->setTexture(imread("./textures/instructions.jpg"));
+	instructions->Scale(2, 0.94, instructions->mCenter);
+	instructions->Draw(&screen);
+	delete(instructions);
+	delete(credits);
+	delete(tilte);
 }
 
 int main(int argc, char** argv)
