@@ -151,8 +151,9 @@ int main(int argc, char** argv)
 	TruncateTexture(viewport, texture);
 	showInitialScreen(viewport);
 	imshow(windowName, viewport);
-	PlaySound(TEXT("./sound/tema\ tampinha.wav"), NULL, SND_ASYNC | SND_LOOP);
+	PlaySound(TEXT("./sound/intro.wav"), NULL, SND_ASYNC | SND_LOOP);
 	waitKey(0);
+	PlaySound(TEXT("./sound/sobre_as_estrelas.wav"), NULL, SND_ASYNC | SND_LOOP);
 	
 	// Start everything and here we go
 	std::thread scale0(std::bind(scaleThread,polygons[0], center));
