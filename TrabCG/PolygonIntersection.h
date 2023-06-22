@@ -148,37 +148,17 @@ namespace lib {
             if (window->containsPoint(p1)) {
                 intersection->addPoint(p1);
             }
-
-            // Iterate over each point of the window
-            for (size_t j = 0; j < points2.size(); j++) {
-
-                const Point& q1 = points2[j];
-                const Point& q2 = points2[(j + 1) % points2.size()];
-
-                // Check if the line segments intersect
-                if (doSegmentsIntersect(p1, p2, q1, q2)) {
-                    // Calculate the intersection point
-                    Point intersectionPoint = computeIntersection(p1, p2, q1, q2);
-
-                    // Add the intersection point to the new polygon
-                    intersection->addPoint(intersectionPoint);
-                }
+            if (!window->containsPoint(p1)) {
+                Point projection = projectPointOntoPolygon(p1, points2);
+                intersection->addPoint(projection);
             }
+
         }
 
         // Check if there are any intersection points
         if (intersection->getPoints().size() == 0) {
             delete intersection;
             return nullptr;
-        }
-
-        // Add projected points of the polygon vertices outside the window
-        const std::vector<Point>& intersectionPoints = intersection->getPoints();
-        for (const Point& p : points1) {
-            if (!window->containsPoint(p)) {
-                Point projection = projectPointOntoPolygon(p, points2);
-                intersection->addPoint(projection);
-            }
         }
 
         return intersection;

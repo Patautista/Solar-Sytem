@@ -103,48 +103,9 @@ int main(int argc, char** argv)
 	Mat texture = cv::imread("./textures/background.png");
 	
 	//auto circle = createCircle(viewport_height * 0.25, center, 30, Color::blue);
+	auto square = createSquare(400, center, {Color::red, Color::red ,Color::red,Color::red});
 
-	// Sun
-	auto sun = createOctagon(center, 70,
-		{ Color::red , Color::orange, Color::yellow, Color::orange, Color::white, Color::red, Color::yellow,  Color::orange }
-	);
-	polygons.push_back(sun);
-	// Mercury
-	auto mercury = createOctagon(lib::Point(-120, 40), 20,
-		{ Color::pastelRed , Color::gray, Color::cream, Color::pastelRed, Color::cream, Color::brown, Color::darkRed,  Color::gray }
-	);
-	polygons.push_back(mercury);
-	// Venus
-	auto venus = createOctagon(lib::Point(-160, 120), 40,
-		{ Color::orange , Color::gray, Color::darkRed, Color::gray, Color::brown, Color::orange, Color::brown,  Color::black }
-	);
-	polygons.push_back(venus);
-	// Earth :D
-	auto earth = createOctagon(lib::Point(-250, 200), 40,
-		{ Color::blue , Color::gray, Color::darkGreen, Color::blue, Color::green, Color::white, Color::brown,  Color::darkBlue }
-	);
-	polygons.push_back(earth);
-	// Mars
-	auto mars = createOctagon(lib::Point(-340, 218), 28,
-		{ Color::darkRed , Color::red, Color::brown, Color::orange , Color::black, Color::brown, Color::red,  Color::darkYellow }
-	);
-	polygons.push_back(mars);
-	// Jupiter
-	auto jupiter = createOctagon(lib::Point(-600, 420), 60,
-		{ Color::cream , Color::brown, Color::pastelRed, Color::cream , Color::brown, Color::pastelRed, Color::cream,  Color::brown }
-	);
-	polygons.push_back(jupiter);
-	// Saturn
-	auto saturn = createOctagon(lib::Point(-900, 420), 60,
-		{ Color::cream , Color::brown, Color::pastelRed, Color::cream , Color::brown, Color::pastelRed, Color::cream,  Color::brown }
-	);
-	saturn->setTexture(imread("./textures/saturn.jpg"));
-	polygons.push_back(saturn);
-	// Uran
-	auto uran = createOctagon(lib::Point(-1100, 1400), 47,
-		{ Color::pastelBlue , Color::gray, Color::pastelBlue, Color::cyan , Color::gray, Color::blue, Color::cyan,  Color::gray }
-	);
-	polygons.push_back(uran);
+	polygons.push_back(square);
 
 	window.UpdateVisiblePolygons(polygons);
 	window.Zoom(3);
@@ -155,15 +116,6 @@ int main(int argc, char** argv)
 	waitKey(0);
 	PlaySound(TEXT("./sound/sobre_as_estrelas.wav"), NULL, SND_ASYNC | SND_LOOP);
 	
-	// Start everything and here we go
-	std::thread scale0(std::bind(scaleThread,polygons[0], center));
-	std::thread rotate1(std::bind(rotateThread, polygons[1], -15, center));
-	std::thread rotate2(std::bind(rotateThread, polygons[2], -5, center));
-	std::thread rotate3(std::bind(rotateThread, polygons[3], -4, center));
-	std::thread rotate4(std::bind(rotateThread, polygons[4], -7, center));
-	std::thread rotate5(std::bind(rotateThread, polygons[5], -4.5, center));
-	std::thread rotate6(std::bind(rotateThread, polygons[6], -10, center));
-	std::thread rotate7(std::bind(rotateThread, polygons[7], -6.8, center));
 
 	while (true) {
 		if (GetAsyncKeyState(VK_LEFT) & 0x8000) {
@@ -195,14 +147,7 @@ int main(int argc, char** argv)
 	}
 	stopFlag = true;
 	PlaySound(NULL, NULL, 0);
-	scale0.join();
-	rotate1.join();
-	rotate2.join();
-	rotate3.join();
-	rotate4.join();
-	rotate5.join();
-	rotate6.join();
-	rotate7.join();
+
 	cv::destroyWindow(windowName); //destroy the created window
 	
 	for (auto poly : polygons) {
