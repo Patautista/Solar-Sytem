@@ -4,7 +4,7 @@ Animação interativa do sistema solar usando apenas funcionalidades de exibiç�
 
 Desenvolvido por Caleb Sousa e Igor Melo para a disciplina de Computação Gráfica da Universidade Federal do Ceará.
 
-English:
+**English:**
 
 Interactive animation of the solar system using only display features from the opencv library and matrix functions.
 
