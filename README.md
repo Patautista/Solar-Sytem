@@ -1,4 +1,4 @@
-# TrabCG
+# Trabalho de CG
 
 Animação interativa do sistema solar usando apenas funcionalidades de exibição da biblioteca opencv e funções matriciais.
 
